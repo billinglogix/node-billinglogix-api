@@ -12,7 +12,18 @@ const auth = {
     secret: process.env.SECRET_KEY,
 };
 const clientOptions = {
-    debug: true,
+    debug: process.env.DEBUG === "true",
+};
+
+/**
+ * Logger Helper
+ */
+const logger = {
+    debug: (...args) => {
+        if (clientOptions.debug) {
+            console.debug(...args);
+        }
+    },
 };
 
 describe("Initialization", () => {
@@ -269,7 +280,7 @@ describe("BillingLogixClient - Callbacks", () => {
                     method: "get",
                 },
                 (error, data) => {
-                    console.log("callback request done", error, data?.length);
+                    logger.debug("callback request done", error, data?.length);
                     expect(error).to.equal(null);
                     expect(data).to.have.length.greaterThan(0);
                     done();
@@ -280,7 +291,7 @@ describe("BillingLogixClient - Callbacks", () => {
 
         it("callback: should fail with invalid options", (done) => {
             const request = client.request("invalid_options", (error, data) => {
-                console.log(
+                logger.debug(
                     "invalid options: callback request done",
                     error?.message,
                     data
@@ -299,7 +310,7 @@ describe("BillingLogixClient - Callbacks", () => {
                     method: "invalid",
                 },
                 (error, data) => {
-                    console.log(
+                    logger.debug(
                         "invalid options: callback request done",
                         error?.message,
                         data
@@ -319,7 +330,7 @@ describe("BillingLogixClient - Callbacks", () => {
                     method: "get",
                 },
                 (error, data) => {
-                    console.log(
+                    logger.debug(
                         "invalid options: callback request done",
                         error?.message,
                         data
@@ -339,7 +350,7 @@ describe("BillingLogixClient - Callbacks", () => {
                     method: "get",
                 },
                 (error, data) => {
-                    console.log(
+                    logger.debug(
                         "invalid options: callback request done",
                         error?.message,
                         data
@@ -358,7 +369,7 @@ describe("BillingLogixClient - Callbacks", () => {
                     method: "get",
                 },
                 (error, data) => {
-                    console.log(
+                    logger.debug(
                         "invalid options: callback request done",
                         error?.message,
                         data
@@ -378,7 +389,7 @@ describe("BillingLogixClient - Callbacks", () => {
                     method: "get",
                 },
                 (error, data) => {
-                    console.log(
+                    logger.debug(
                         "invalid options: callback request done",
                         error?.message,
                         data
@@ -399,7 +410,7 @@ describe("BillingLogixClient - Callbacks", () => {
                     timeout: "invalid",
                 },
                 (error, data) => {
-                    console.log(
+                    logger.debug(
                         "invalid options: callback request done",
                         error?.message,
                         data
@@ -420,7 +431,7 @@ describe("BillingLogixClient - Callbacks", () => {
                     timeout: 500,
                 },
                 (error, data) => {
-                    console.log(
+                    logger.debug(
                         "invalid options: callback request done",
                         error?.message,
                         data
@@ -441,7 +452,7 @@ describe("BillingLogixClient - Callbacks", () => {
                     timeout: 60001,
                 },
                 (error, data) => {
-                    console.log(
+                    logger.debug(
                         "invalid options: callback request done",
                         error?.message,
                         data
@@ -462,7 +473,7 @@ describe("BillingLogixClient - Callbacks", () => {
                     query: "invalid",
                 },
                 (error, data) => {
-                    console.log(
+                    logger.debug(
                         "invalid options: callback request done",
                         error?.message,
                         data
@@ -486,7 +497,7 @@ describe("BillingLogixClient - Callbacks", () => {
                     timeout: 10000,
                 },
                 (error, data) => {
-                    console.log(
+                    logger.debug(
                         "all options: callback request done",
                         error,
                         data?.length
@@ -527,7 +538,7 @@ describe("BillingLogixClient - Promises", () => {
             try {
                 const data = await client.request("invalid_options");
             } catch (error) {
-                console.log("invalid options error", error);
+                logger.debug("invalid options error", error);
                 expect(error).to.be.an.instanceof(BillingLogixApiError);
             }
         });
@@ -539,7 +550,7 @@ describe("BillingLogixClient - Promises", () => {
                     method: "invalid",
                 });
             } catch (error) {
-                console.log("invalid options error", error);
+                logger.debug("invalid options error", error);
                 expect(error).to.be.an.instanceof(BillingLogixApiError);
             }
         });
@@ -551,7 +562,7 @@ describe("BillingLogixClient - Promises", () => {
                     method: "get",
                 });
             } catch (error) {
-                console.log("invalid options error", error);
+                logger.debug("invalid options error", error);
                 expect(error).to.be.an.instanceof(BillingLogixApiError);
             }
         });
@@ -563,7 +574,7 @@ describe("BillingLogixClient - Promises", () => {
                     method: "get",
                 });
             } catch (error) {
-                console.log("invalid options error", error);
+                logger.debug("invalid options error", error);
                 expect(error).to.be.an.instanceof(BillingLogixApiError);
             }
         });
@@ -574,7 +585,7 @@ describe("BillingLogixClient - Promises", () => {
                     method: "get",
                 });
             } catch (error) {
-                console.log("invalid options error", error);
+                logger.debug("invalid options error", error);
                 expect(error).to.be.an.instanceof(BillingLogixApiError);
             }
         });
@@ -586,7 +597,7 @@ describe("BillingLogixClient - Promises", () => {
                     method: "get",
                 });
             } catch (error) {
-                console.log("invalid options error", error);
+                logger.debug("invalid options error", error);
                 expect(error).to.be.an.instanceof(BillingLogixApiError);
             }
         });
@@ -599,7 +610,7 @@ describe("BillingLogixClient - Promises", () => {
                     timeout: "invalid",
                 });
             } catch (error) {
-                console.log("invalid options error", error);
+                logger.debug("invalid options error", error);
                 expect(error).to.be.an.instanceof(BillingLogixApiError);
             }
         });
@@ -612,7 +623,7 @@ describe("BillingLogixClient - Promises", () => {
                     timeout: 500,
                 });
             } catch (error) {
-                console.log("invalid options error", error);
+                logger.debug("invalid options error", error);
                 expect(error).to.be.an.instanceof(BillingLogixApiError);
             }
         });
@@ -625,7 +636,7 @@ describe("BillingLogixClient - Promises", () => {
                     timeout: 60001,
                 });
             } catch (error) {
-                console.log("invalid options error", error);
+                logger.debug("invalid options error", error);
                 expect(error).to.be.an.instanceof(BillingLogixApiError);
             }
         });
@@ -638,7 +649,7 @@ describe("BillingLogixClient - Promises", () => {
                     query: "invalid",
                 });
             } catch (error) {
-                console.log("invalid options error", error);
+                logger.debug("invalid options error", error);
                 expect(error).to.be.an.instanceof(BillingLogixApiError);
             }
         });
@@ -673,7 +684,7 @@ describe("BillingLogixClient - Promises - Invalid Account", () => {
                     method: "get",
                 });
             } catch (error) {
-                // console.log("invalid account error", error);
+                // logger.debug("invalid account error", error);
                 expect(error).to.be.an.instanceof(Object);
                 expect(error.message).to.equal("Forbidden");
             }
@@ -692,7 +703,7 @@ describe("BillingLogixClient - Promises - Invalid Account", () => {
                     method: "get",
                 });
             } catch (error) {
-                // console.log("invalid auth key error", error);
+                // logger.debug("invalid auth key error", error);
                 expect(error).to.be.an.instanceof(Object);
                 expect(error.statusCode).to.equal(401);
                 expect(error.statusMessage).to.equal("Unauthorized");
@@ -715,7 +726,7 @@ describe("BillingLogixClient - Promises - Invalid Account", () => {
                     method: "get",
                 });
             } catch (error) {
-                // console.log("invalid auth secret error", error);
+                // logger.debug("invalid auth secret error", error);
                 expect(error).to.be.an.instanceof(Object);
                 expect(error.statusCode).to.equal(401);
                 expect(error.statusMessage).to.equal("Unauthorized");
@@ -741,7 +752,7 @@ describe("BillingLogixClient - Callbacks - Methods", () => {
 
     it("callback: methods: should get all tags", (done) => {
         client.get("/tags", {}, (error, data) => {
-            console.log("getTags done", error, data?.length);
+            logger.debug("getTags done", error, data?.length);
             expect(error).to.equal(null);
             expect(data).to.have.length.greaterThan(0);
             done();
@@ -750,7 +761,7 @@ describe("BillingLogixClient - Callbacks - Methods", () => {
 
     it("callback: methods: should get all tags with query", (done) => {
         client.get("/tags", { query: { limit: 1 } }, (error, data) => {
-            console.log("getTags done", error, data?.length);
+            logger.debug("getTags done", error, data?.length);
             expect(error).to.equal(null);
             expect(data).to.have.length.greaterThan(0);
             // expect(data).to.have.length.equal(1);
@@ -763,7 +774,7 @@ describe("BillingLogixClient - Callbacks - Methods", () => {
             "/tags",
             { query: { limit: 1 }, timeout: 10000 },
             (error, data) => {
-                console.log("getTags done", error, data?.length);
+                logger.debug("getTags done", error, data?.length);
                 expect(error).to.equal(null);
                 expect(data).to.have.length.greaterThan(0);
                 // expect(data).to.have.length.equal(1);
@@ -774,7 +785,7 @@ describe("BillingLogixClient - Callbacks - Methods", () => {
 
     it("callback: methods: should get a tag that doesn't exist", (done) => {
         client.get(`/tags/${uuidv4()}`, {}, (error, data) => {
-            console.log("getTag done", error, data);
+            logger.debug("getTag done", error, data);
             expect(data).to.equal(undefined);
             expect(error).to.be.an.instanceof(Object);
             expect(error.statusCode).to.equal(404);
@@ -793,7 +804,7 @@ describe("BillingLogixClient - Callbacks - Methods", () => {
             { label: `Test Invalid Tag`, color: "#000000" },
             {},
             (error, data) => {
-                console.log("updateTag done", error, data);
+                logger.debug("updateTag done", error, data);
                 expect(data).to.equal(undefined);
                 expect(error).to.be.an.instanceof(Object);
                 expect(error.statusCode).to.equal(404);
@@ -809,7 +820,7 @@ describe("BillingLogixClient - Callbacks - Methods", () => {
 
     it("callback: methods: should delete a tag that doesn't exist", (done) => {
         client.delete(`/tags/${uuidv4()}`, {}, (error, data) => {
-            console.log("deleteTag done", error, data);
+            logger.debug("deleteTag done", error, data);
             expect(data).to.equal(undefined);
             expect(error).to.be.an.instanceof(Object);
             expect(error.statusCode).to.equal(404);
@@ -831,7 +842,7 @@ describe("BillingLogixClient - Callbacks - Methods", () => {
         };
 
         client.post("/tags", tag, {}, (error, data) => {
-            console.log("createTag done", error, data);
+            logger.debug("createTag done", error, data);
             expect(error).to.equal(null);
             expect(data).to.be.an.instanceof(Object);
             expect(data.name).to.equal(tag.name);
@@ -845,7 +856,7 @@ describe("BillingLogixClient - Callbacks - Methods", () => {
             };
 
             client.put(`/tags/${tagId}`, updateTag, {}, (error, data) => {
-                console.log("updateTag done", error, data);
+                logger.debug("updateTag done", error, data);
                 expect(error).to.equal(null);
                 expect(data).to.be.an.instanceof(Object);
                 expect(data.name).to.equal(tag.name);
@@ -853,7 +864,7 @@ describe("BillingLogixClient - Callbacks - Methods", () => {
                 expect(data.color).to.equal(updateTag.color);
 
                 client.delete(`/tags/${tagId}`, {}, (error, data) => {
-                    console.log("deleteTag done", error, data);
+                    logger.debug("deleteTag done", error, data);
                     expect(error).to.equal(null);
                     expect(data).to.be.an.instanceof(Object);
                     expect(data.success).to.equal(true);
@@ -900,7 +911,7 @@ describe("BillingLogixClient - Promises - Methods", () => {
         try {
             const data = await client.get(`/tags/${uuidv4()}`, {});
         } catch (error) {
-            console.log("getTag error", error);
+            logger.debug("getTag error", error);
             expect(error).to.be.an.instanceof(Object);
             expect(error.statusCode).to.equal(404);
             expect(error.statusMessage).to.equal("Not Found");
@@ -919,7 +930,7 @@ describe("BillingLogixClient - Promises - Methods", () => {
                 {}
             );
         } catch (error) {
-            console.log("updateTag error", error);
+            logger.debug("updateTag error", error);
             expect(error).to.be.an.instanceof(Object);
             expect(error.statusCode).to.equal(404);
             expect(error.statusMessage).to.equal("Not Found");
@@ -934,7 +945,7 @@ describe("BillingLogixClient - Promises - Methods", () => {
         try {
             const data = await client.delete(`/tags/${uuidv4()}`, {});
         } catch (error) {
-            console.log("deleteTag error", error);
+            logger.debug("deleteTag error", error);
             expect(error).to.be.an.instanceof(Object);
             expect(error.statusCode).to.equal(404);
             expect(error.statusMessage).to.equal("Not Found");
