@@ -1,6 +1,6 @@
 # This workflow will create a new release for the package
 
-name: Publish
+name: Publish New Version
 
 on:
   workflow_dispatch:
@@ -29,7 +29,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Build
-        run: npm build
+        run: npm run build
       - name: Test
         run: npm test
         env:
