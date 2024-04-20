@@ -126,14 +126,14 @@ blxClient.request(
 
 ### Specific Method Calls
 
-For each request method type, functions exists to make common calls:
+For each request method type, functions exists to make common calls. The options and callback are optional for each call.
 
 ```javascript
-blxClient.get(path, options, callback);
-blxClient.post(path, body, options, callback);
-blxClient.put(path, body, options, callback);
-blxClient.patch(path, body, options, callback);
-blxClient.delete(path, options, callback);
+blxClient.get(path, [options], [callback]);
+blxClient.post(path, body, [options], [callback]);
+blxClient.put(path, body, [options], [callback]);
+blxClient.patch(path, body, [options], [callback]);
+blxClient.delete(path, [options], [callback]);
 ```
 
 This allows shorthand forms like:
