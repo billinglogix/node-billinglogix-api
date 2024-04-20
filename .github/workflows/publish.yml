@@ -1,0 +1,43 @@
+# This workflow will create a new release for the package
+
+name: Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "major | minor | patch"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+jobs:
+  publish-new-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v3
+      - name: Use Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm build
+      - name: Create New Version
+        run: |
+          npm version --new-version ${{github.event.inputs.release}} --no-git-tag-version
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          git commit -a -m "v${PACKAGE_VERSION}"
+          git push
+      - name: Create Release
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          gh release create "v${PACKAGE_VERSION}"
+        
