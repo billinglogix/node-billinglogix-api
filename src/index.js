@@ -57,58 +57,64 @@ export class BillingLogixClient {
             !regex.acccountSub.test(acccountSub)
         ) {
             throw new BillingLogixApiError(
-                "Missing or invalid account subdomain: " + acccountSub
+                `Missing or invalid account subdomain: ${acccountSub}`
             );
         }
         if (typeof accessKey !== "string" || !regex.accessKey.test(accessKey)) {
             throw new BillingLogixApiError(
-                "Missing or invalid access key: " + accessKey
+                `Missing or invalid access key: ${accessKey}`
             );
         }
         if (typeof secretKey !== "string" || !regex.secretKey.test(secretKey)) {
             throw new BillingLogixApiError(
-                "Missing or invalid secret key: " + secretKey
+                `Missing or invalid secret key: ${secretKey}`
             );
         }
 
         if (typeof options !== "object") {
             throw new BillingLogixApiError(
-                "Invalid options object: " + options
+                `Invalid options object: ${typeof options}`,
+                options
             );
         }
         options = { ...defaultOptions, ...options };
+
         if (typeof options.version !== "string") {
             throw new BillingLogixApiError(
-                "Invalid API version: " + options.version
+                `Invalid API version: ${options.version}`
             );
         } else if (options.version !== "v1") {
             throw new BillingLogixApiError(
-                "Unsupported API version: " + options.version
+                `Unsupported API version: ${options.version}`
             );
         }
 
         if (typeof options.timeout !== "number") {
             throw new BillingLogixApiError(
-                "Invalid request timeout: " + options.timeout
+                `Invalid request timeout: ${options.timeout}`
             );
         } else if (options.timeout < 1000 || options.timeout > 60000) {
             throw new BillingLogixApiError(
-                "Unsupported request timeout: " + options.timeout
+                `Unsupported request timeout: ${options.timeout}`
             );
         }
 
         if (typeof options.headers !== "object") {
             throw new BillingLogixApiError(
-                "Invalid additional request headers: " + options.headers
+                `Invalid additional request headers: ${typeof options.headers}`,
+                options.headers
             );
         } else {
             for (const key in options.headers) {
-                if (
-                    typeof key !== "string" ||
-                    typeof options.headers[key] !== "string"
-                ) {
+                if (typeof key !== "string") {
                     throw new BillingLogixApiError(
-                        "Invalid request header value: " + options.headers[key]
+                        `Invalid request header key: ${key}`,
+                        options.headers
+                    );
+                } else if (typeof options.headers[key] !== "string") {
+                    throw new BillingLogixApiError(
+                        `Invalid request header value: ${options.headers[key]}`,
+                        options.headers
                     );
                 }
             }
@@ -176,7 +182,7 @@ export class BillingLogixClient {
     }
 
     request(options, done) {
-        this.#log("Request Options", options, done);
+        this.#log("Request Options", options, done ? "Callback" : "Promise");
         const requestPromise = new Promise((resolve, reject) => {
             try {
                 const requestOptions = this.#includeApiJwt({
@@ -192,7 +198,10 @@ export class BillingLogixClient {
                     requestOptions.path = `/${requestOptions.path}`;
                 }
 
-                this.#log("Fetch Options", this.#apiBaseUrl, requestOptions);
+                this.#log("Fetch Options", {
+                    path: requestOptions.path,
+                    method: requestOptions.method,
+                });
                 fetch(
                     `${this.#apiBaseUrl}${requestOptions.path}`,
                     requestOptions
