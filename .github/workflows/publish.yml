@@ -38,6 +38,8 @@ jobs:
           SECRET_KEY: ${{secrets.SECRET_KEY}}
       - name: Create New Version
         run: |
+          git config --global user.email "${{secrets.USER_EMAIL}}"
+          git config --global user.name "${{secrets.USER_NAME}}"
           npm version --new-version ${{github.event.inputs.release}} --no-git-tag-version
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           git commit -a -m "v${PACKAGE_VERSION}"
