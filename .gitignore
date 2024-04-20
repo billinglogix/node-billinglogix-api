@@ -14,8 +14,6 @@ lerna-debug.log*
 .nitro
 .cache
 .astro
-dist
-dist-ssr
 .next
 server/dist
 public/dist
@@ -23,8 +21,6 @@ public/dist
 
 # Node dependencies
 node_modules
-dist
-dist-ssr
 *.local
 
 # Editor directories and files

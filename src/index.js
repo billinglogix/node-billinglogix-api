@@ -10,9 +10,9 @@
  * @repository https://github.com/billinglogix/node-billinglogix-api
  */
 
-const https = require("node:https");
-const { BillingLogixApiError } = require("./lib/errors");
-const jwt = require("jsonwebtoken");
+import { BillingLogixApiError } from "./lib/errors.js";
+import fetch from "node-fetch";
+import jwt from "jsonwebtoken";
 
 /**
  * BillingLogix API Options
@@ -22,19 +22,21 @@ const defaultOptions = {
     version: "v1",
     timeout: 10000,
     headers: {},
+    debug: false,
 };
 
 /**
  * BillingLogix API Client
  * @class
  */
-class BillingLogixClient {
+export class BillingLogixClient {
     #accessKey;
     #secretKey;
     #options;
     #apiBaseUrl;
     #apiHeaders;
     #apiTimeout;
+    #debug;
 
     /**
      * Create the BillingLogix API Client.
@@ -112,15 +114,40 @@ class BillingLogixClient {
             }
         }
 
+        this.#options = options;
         this.#accessKey = accessKey;
         this.#secretKey = secretKey;
-        this.#options = options;
         this.#apiBaseUrl = `https://${acccountSub}.billinglogix.com/api/${options.version}`;
         this.#apiHeaders = {
-            "Content-Type": "application/json",
             ...options.headers,
+            "User-Agent": "BillingLogix API Client v1.0.0",
+            "Content-Type": "application/json",
+            "Accept": "application/json",
         };
         this.#apiTimeout = options.timeout;
+        this.#debug = options.debug === true;
+    }
+
+    /**
+     * Log debug messages
+     * @param {string} message - Debug message
+     * @returns {void}
+     */
+    #log() {
+        if (this.#debug) {
+            console.debug(...arguments);
+        }
+    }
+
+    /**
+     * Log error messages
+     * @param {string} message - Debug message
+     * @returns {void}
+     */
+    #error() {
+        if (this.#debug) {
+            console.error(...arguments);
+        }
     }
 
     /**
@@ -149,58 +176,94 @@ class BillingLogixClient {
     }
 
     request(options, done) {
-        const promise = new Promise((resolve, reject) => {
-            const requestOptions = this.#includeApiJwt({
-                ...options,
-                headers: {
-                    ...options.headers,
-                    ...this.#apiHeaders,
-                },
-                timeout: options.timeout || this.#apiTimeout,
-            });
+        this.#log("Request Options", options, done);
+        const requestPromise = new Promise((resolve, reject) => {
+            try {
+                const requestOptions = this.#includeApiJwt({
+                    ...options,
+                    headers: {
+                        ...options.headers,
+                        ...this.#apiHeaders,
+                    },
+                    timeout: options.timeout || this.#apiTimeout,
+                });
 
-            const request = https.request(
-                this.#apiBaseUrl + requestOptions.path,
-                requestOptions,
-                (response) => {
-                    let data = "";
-                    response.on("data", (chunk) => {
-                        data += chunk;
-                    });
-                    response.on("end", () => {
-                        if (
-                            response.statusCode >= 200 &&
-                            response.statusCode < 300
-                        ) {
-                            resolve(JSON.parse(data));
-                        } else {
-                            reject(new BillingLogixApiError(data));
-                        }
-                    });
+                if (requestOptions.path.charAt(0) !== "/") {
+                    requestOptions.path = `/${requestOptions.path}`;
                 }
-            );
 
-            request.on("error", (error) => {
-                reject(new BillingLogixApiError(error));
-            });
-
-            request.end();
-
-            return resolve(request);
+                this.#log("Fetch Options", this.#apiBaseUrl, requestOptions);
+                fetch(
+                    `${this.#apiBaseUrl}${requestOptions.path}`,
+                    requestOptions
+                )
+                    .then((response) => {
+                        if (response.ok) {
+                            response
+                                .json()
+                                .then((data) => {
+                                    this.#log("Response Success");
+                                    resolve(data);
+                                })
+                                .catch((err) => {
+                                    this.#error("Response Parsing Error", err);
+                                    reject(
+                                        new BillingLogixApiError(
+                                            "Error parsing response data",
+                                            err
+                                        )
+                                    );
+                                });
+                        } else {
+                            response
+                                .json()
+                                .then((data) => {
+                                    this.#log("Response Error", data);
+                                    reject(data);
+                                    // reject(
+                                    //     new BillingLogixApiError(
+                                    //         `Error: ${response.statusText}`,
+                                    //         data
+                                    //     )
+                                    // );
+                                })
+                                .catch((err) => {
+                                    this.#error("Response Failure", err);
+                                    reject(
+                                        new BillingLogixApiError(
+                                            "Error parsing request failure",
+                                            err
+                                        )
+                                    );
+                                });
+                        }
+                    })
+                    .catch((err) => {
+                        this.#error("Request Failure", err);
+                        reject(
+                            new BillingLogixApiError("Request Failure", err)
+                        );
+                    });
+            } catch (err) {
+                this.#error("Unexpected Error", err);
+                reject(new BillingLogixApiError("Unexpected Error", err));
+            }
         });
 
         if (done) {
-            promise
-                .then(function (result) {
+            requestPromise
+                .then((result) => {
+                    this.#log("Promise", "Done");
                     done(null, result);
                 })
-                .catch(function (err) {
+                .catch((err) => {
+                    this.#log("Promise", "Error", result);
                     done(err);
                 });
             return undefined;
         }
-
-        return promise;
+        this.#log("Promise Returned", "No callback");
+        return requestPromise;
     }
 
     get(path, options = {}, done) {
@@ -246,4 +309,4 @@ class BillingLogixClient {
     }
 }
 
-module.exports = exports = BillingLogixClient;
+export default BillingLogixClient;

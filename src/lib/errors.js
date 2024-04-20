@@ -5,7 +5,7 @@
  * @param {object} data - Additional error data
  * @type {BillingLogixApiError} - BillingLogix API Error
  */
-class BillingLogixApiError extends Error {
+export class BillingLogixApiError extends Error {
     constructor(message, data) {
         super(message);
         this.name = this.constructor.name;
@@ -37,5 +37,3 @@ BillingLogixApiError.prototype.toJSON = function (stack = false) {
         };
     }
 };
-
-module.exports = exports = { BillingLogixApiError };

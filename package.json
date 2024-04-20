@@ -4,6 +4,7 @@
     "description": "Billing Logix API wrapper for the account APIs.",
     "author": "Todd Schlomer <todd@billinglogix.com> (https://billinglogix.com)",
     "license": "MIT",
+    "type": "module",
     "main": "./dist/cjs/index.js",
     "module": "./dist/mjs/index.js",
     "types": "./dist/types.d.ts",
@@ -28,20 +29,22 @@
     "scripts": {
         "build": "rm -rf dist && node esbuild.js && tsc",
         "watch": "npm run build -- --watch src",
-        "test": "jest",
+        "test": "mocha --recursive -t 10000",
         "prepublishOnly": "npm run build"
     },
     "dependencies": {
-        "jsonwebtoken": "9.0.2"
+        "jsonwebtoken": "^9.0.2",
+        "node-fetch": "^3.3.2"
     },
     "devDependencies": {
         "@types/jest": "^29.5.12",
         "@types/node": "^20.5.0",
         "@types/prettier": "^3.0.0",
-        "dotenv": "16.4.5",
+        "chai": "^5.1.0",
+        "dotenv": "^16.4.5",
         "esbuild": "^0.20.2",
         "esbuild-node-externals": "^1.13.0",
-        "jest": "^29.7.0",
+        "mocha": "^10.4.0",
         "prettier": "^3.2.5",
         "typescript": "^5.1.6"
     },
