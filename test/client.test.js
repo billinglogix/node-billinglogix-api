@@ -13,7 +13,6 @@ const auth = {
 const clientOptions = {
     debug: true,
 };
-// console.debug("Auth Details", auth, clientOptions);
 
 describe("Initialization", () => {
     it("should fail for no auth", () => {

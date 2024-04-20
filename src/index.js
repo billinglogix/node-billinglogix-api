@@ -15,8 +15,16 @@ import fetch from "node-fetch";
 import jwt from "jsonwebtoken";
 
 /**
+ * Valid HTTP methods
+ * @type {string[]}
+ * @constant
+ */
+const validMethods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
+
+/**
  * BillingLogix API Options
  * @type {import("./types").BillingLogixOptions}
+ * @constant
  */
 const defaultOptions = {
     version: "v1",
@@ -27,6 +35,7 @@ const defaultOptions = {
 
 /**
  * BillingLogix API Client
+ * @type {import("./types").BillingLogixClient}
  * @class
  */
 export class BillingLogixClient {
@@ -181,17 +190,103 @@ export class BillingLogixClient {
         return request;
     }
 
+    /**
+     * Clean the input headers
+     * @param {import("./types").Headers} headers - Request headers
+     * @returns {import("./types").Headers} - Cleaned headers
+     */
+    #cleanHeaders(headers) {
+        if (typeof headers !== "object") {
+            return {};
+        }
+        const cleanHeaders = {};
+        for (const [key, value] in headers) {
+            if (typeof key !== "string" || typeof value !== "string") {
+                this.#log("Invalid Header", key, value);
+                continue;
+            }
+            cleanHeaders[key.trim()] = value.trim();
+        }
+        return cleanHeaders;
+    }
+
+    /**
+     * Make an API request
+     * @param {import("./types").BillingLogixRequestOptions} options - Request options
+     * @param {Function | undefined} done - Callback function
+     * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
+     * @throws {BillingLogixApiError} - Invalid request
+     */
     request(options, done) {
         this.#log("Request Options", options, done ? "Callback" : "Promise");
+
+        if (!options?.method || typeof options.method !== "string") {
+            throw new BillingLogixApiError("Invalid request method", options);
+        } else if (!validMethods.includes(options.method.toUpperCase())) {
+            throw new BillingLogixApiError(
+                "Unsupported request method",
+                options
+            );
+        }
+
+        if (!options?.path || typeof options.path !== "string") {
+            throw new BillingLogixApiError("Invalid request path", options);
+        }
+
+        if (
+            typeof options.timeout !== "undefined" &&
+            typeof options.timeout !== "number"
+        ) {
+            throw new BillingLogixApiError("Invalid request timeout", options);
+        } else if (options.timeout < 1000 || options.timeout > 60000) {
+            throw new BillingLogixApiError(
+                "Unsupported request timeout",
+                options
+            );
+        }
+
+        if (
+            typeof options.query !== "undefined" &&
+            typeof options.query !== "object"
+        ) {
+            throw new BillingLogixApiError(
+                "Invalid request query params",
+                options
+            );
+        }
+
+        // AbortController was added in node v14.17.0 globally; if not available, don't support timeouts
+        const AbortController = globalThis.AbortController ?? undefined;
+        const controller = AbortController ? new AbortController() : undefined;
+        const timeout = AbortController
+            ? setTimeout(() => {
+                  controller.abort();
+              }, this.#apiTimeout)
+            : undefined;
+        if (controller === undefined) {
+            this.#log("AbortController", "Not Supported");
+        }
+
         const requestPromise = new Promise((resolve, reject) => {
             try {
+                const queryString = options.query
+                    ? `?${new URLSearchParams(options.query).toString()}`
+                    : "";
+
                 const requestOptions = this.#includeApiJwt({
-                    ...options,
+                    method: options.method,
+                    path: options.path,
                     headers: {
-                        ...options.headers,
+                        ...this.#cleanHeaders(options.headers),
                         ...this.#apiHeaders,
                     },
                     timeout: options.timeout || this.#apiTimeout,
+                    body: options.body
+                        ? typeof options.body === "string"
+                            ? options.body
+                            : JSON.stringify(options.body)
+                        : null,
+                    signal: controller ? controller.signal : null,
                 });
 
                 if (requestOptions.path.charAt(0) !== "/") {
@@ -199,11 +294,12 @@ export class BillingLogixClient {
                 }
 
                 this.#log("Fetch Options", {
-                    path: requestOptions.path,
                     method: requestOptions.method,
+                    path: requestOptions.path,
+                    query: queryString,
                 });
                 fetch(
-                    `${this.#apiBaseUrl}${requestOptions.path}`,
+                    `${this.#apiBaseUrl}${requestOptions.path}${queryString}`,
                     requestOptions
                 )
                     .then((response) => {
@@ -257,7 +353,19 @@ export class BillingLogixClient {
                 this.#error("Unexpected Error", err);
                 reject(new BillingLogixApiError("Unexpected Error", err));
             }
-        });
+        })
+            .then((result) => {
+                if (timeout) {
+                    clearTimeout(timeout);
+                }
+                return result;
+            })
+            .catch((err) => {
+                if (timeout) {
+                    clearTimeout(timeout);
+                }
+                throw err;
+            });
 
         if (done) {
             requestPromise
@@ -275,46 +383,105 @@ export class BillingLogixClient {
         return requestPromise;
     }
 
+    /**
+     * API GET request
+     * @param {string} path - Request path
+     * @param {import("./types").BillingLogixOptionalRequestOptions} options - Request options
+     * @param {Function | undefined} done - Callback function
+     * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
+     * @throws {BillingLogixApiError} - Invalid request
+     */
     get(path, options = {}, done) {
-        const requestOptions = {
-            ...options,
-            path: path,
-            method: "get",
-        };
-
-        return this.request(options, done);
+        return this.request(
+            {
+                ...options,
+                path: path,
+                method: "GET",
+            },
+            done
+        );
     }
 
-    post(path, data, options = {}, done) {
-        const requestOptions = {
-            ...options,
-            path: path,
-            method: "post",
-            data: data,
-        };
-
-        return this.request(options, done);
+    /**
+     * API POST request
+     * @param {string} path - Request path
+     * @param {any} body - Request body
+     * @param {import("./types").BillingLogixOptionalRequestOptions} options - Request options
+     * @param {Function | undefined} done - Callback function
+     * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
+     * @throws {BillingLogixApiError} - Invalid request
+     */
+    post(path, body, options = {}, done) {
+        return this.request(
+            {
+                ...options,
+                path: path,
+                method: "POST",
+                body: body,
+            },
+            done
+        );
     }
 
-    put(path, data, options = {}, done) {
-        const requestOptions = {
-            ...options,
-            path: path,
-            method: "put",
-            data: data,
-        };
-
-        return this.request(options, done);
+    /**
+     * API PUT request
+     * @param {string} path - Request path
+     * @param {any} body - Request body
+     * @param {import("./types").BillingLogixOptionalRequestOptions} options - Request options
+     * @param {Function | undefined} done - Callback function
+     * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
+     * @throws {BillingLogixApiError} - Invalid request
+     */
+    put(path, body, options = {}, done) {
+        return this.request(
+            {
+                ...options,
+                path: path,
+                method: "PUT",
+                body: body,
+            },
+            done
+        );
     }
 
+    /**
+     * API PATCH request
+     * @param {string} path - Request path
+     * @param {any} body - Request body
+     * @param {import("./types").BillingLogixOptionalRequestOptions} options - Request options
+     * @param {Function | undefined} done - Callback function
+     * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
+     * @throws {BillingLogixApiError} - Invalid request
+     */
+    patch(path, body, options = {}, done) {
+        return this.request(
+            {
+                ...options,
+                path: path,
+                method: "PATCH",
+                body: body,
+            },
+            done
+        );
+    }
+
+    /**
+     * API DELETE request
+     * @param {string} path - Request path
+     * @param {import("./types").BillingLogixOptionalRequestOptions} options - Request options
+     * @param {Function | undefined} done - Callback function
+     * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
+     * @throws {BillingLogixApiError} - Invalid request
+     */
     delete(path, options = {}, done) {
-        const requestOptions = {
-            ...options,
-            path: path,
-            method: "delete",
-        };
-
-        return this.request(options, done);
+        return this.request(
+            {
+                ...options,
+                path: path,
+                method: "DELETE",
+            },
+            done
+        );
     }
 }
 
