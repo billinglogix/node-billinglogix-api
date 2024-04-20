@@ -1,6 +1,7 @@
 import { BillingLogixClient } from "../src/index.js";
 import { BillingLogixApiError } from "../src/lib/errors.js";
 import { expect } from "chai";
+import { v4 as uuidv4 } from "uuid";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -723,5 +724,255 @@ describe("BillingLogixClient - Promises - Invalid Account", () => {
                 expect(error.data.error.name).to.equal("AuthenticationError");
             }
         });
+    });
+});
+
+describe("BillingLogixClient - Callbacks - Methods", () => {
+    let client;
+
+    beforeEach(() => {
+        client = new BillingLogixClient(
+            auth.sub,
+            auth.key,
+            auth.secret,
+            clientOptions
+        );
+    });
+
+    it("callback: methods: should get all tags", (done) => {
+        client.get("/tags", {}, (error, data) => {
+            console.log("getTags done", error, data?.length);
+            expect(error).to.equal(null);
+            expect(data).to.have.length.greaterThan(0);
+            done();
+        });
+    });
+
+    it("callback: methods: should get all tags with query", (done) => {
+        client.get("/tags", { query: { limit: 1 } }, (error, data) => {
+            console.log("getTags done", error, data?.length);
+            expect(error).to.equal(null);
+            expect(data).to.have.length.greaterThan(0);
+            // expect(data).to.have.length.equal(1);
+            done();
+        });
+    });
+
+    it("callback: methods: should get all tags with query and timeout", (done) => {
+        client.get(
+            "/tags",
+            { query: { limit: 1 }, timeout: 10000 },
+            (error, data) => {
+                console.log("getTags done", error, data?.length);
+                expect(error).to.equal(null);
+                expect(data).to.have.length.greaterThan(0);
+                // expect(data).to.have.length.equal(1);
+                done();
+            }
+        );
+    });
+
+    it("callback: methods: should get a tag that doesn't exist", (done) => {
+        client.get(`/tags/${uuidv4()}`, {}, (error, data) => {
+            console.log("getTag done", error, data);
+            expect(data).to.equal(undefined);
+            expect(error).to.be.an.instanceof(Object);
+            expect(error.statusCode).to.equal(404);
+            expect(error.statusMessage).to.equal("Not Found");
+            expect(error).to.be.an.instanceof(Object);
+            expect(error.data).to.be.an.instanceof(Object);
+            expect(error.data.error).to.be.an.instanceof(Object);
+            expect(error.data.error.name).to.equal("NotFound");
+            done();
+        });
+    });
+
+    it("callback: methods: should update a tag that doesn't exist", (done) => {
+        client.put(
+            `/tags/${uuidv4()}`,
+            { label: `Test Invalid Tag`, color: "#000000" },
+            {},
+            (error, data) => {
+                console.log("updateTag done", error, data);
+                expect(data).to.equal(undefined);
+                expect(error).to.be.an.instanceof(Object);
+                expect(error.statusCode).to.equal(404);
+                expect(error.statusMessage).to.equal("Not Found");
+                expect(error).to.be.an.instanceof(Object);
+                expect(error.data).to.be.an.instanceof(Object);
+                expect(error.data.error).to.be.an.instanceof(Object);
+                expect(error.data.error.name).to.equal("NotFound");
+                done();
+            }
+        );
+    });
+
+    it("callback: methods: should delete a tag that doesn't exist", (done) => {
+        client.delete(`/tags/${uuidv4()}`, {}, (error, data) => {
+            console.log("deleteTag done", error, data);
+            expect(data).to.equal(undefined);
+            expect(error).to.be.an.instanceof(Object);
+            expect(error.statusCode).to.equal(404);
+            expect(error.statusMessage).to.equal("Not Found");
+            expect(error).to.be.an.instanceof(Object);
+            expect(error.data).to.be.an.instanceof(Object);
+            expect(error.data.error).to.be.an.instanceof(Object);
+            expect(error.data.error.name).to.equal("NotFound");
+            done();
+        });
+    });
+
+    it("callback: methods: should create, update, and delete a tag", (done) => {
+        const rand = uuidv4().split("-")[0];
+        const tag = {
+            name: `test-tag-${rand}`,
+            label: `Test Tag ${rand}`,
+            color: "#000000",
+        };
+
+        client.post("/tags", tag, {}, (error, data) => {
+            console.log("createTag done", error, data);
+            expect(error).to.equal(null);
+            expect(data).to.be.an.instanceof(Object);
+            expect(data.name).to.equal(tag.name);
+            expect(data.label).to.equal(tag.label);
+            expect(data.color).to.equal(tag.color);
+
+            const tagId = data.id;
+            const updateTag = {
+                label: `Test Tag ${rand} 2`,
+                color: "#000002",
+            };
+
+            client.put(`/tags/${tagId}`, updateTag, {}, (error, data) => {
+                console.log("updateTag done", error, data);
+                expect(error).to.equal(null);
+                expect(data).to.be.an.instanceof(Object);
+                expect(data.name).to.equal(tag.name);
+                expect(data.label).to.equal(updateTag.label);
+                expect(data.color).to.equal(updateTag.color);
+
+                client.delete(`/tags/${tagId}`, {}, (error, data) => {
+                    console.log("deleteTag done", error, data);
+                    expect(error).to.equal(null);
+                    expect(data).to.be.an.instanceof(Object);
+                    expect(data.success).to.equal(true);
+                    done();
+                });
+            });
+        });
+    });
+});
+
+describe("BillingLogixClient - Promises - Methods", () => {
+    let client;
+
+    beforeEach(() => {
+        client = new BillingLogixClient(
+            auth.sub,
+            auth.key,
+            auth.secret,
+            clientOptions
+        );
+    });
+
+    it("promise: methods: should get all tags", async () => {
+        const data = await client.get("/tags", {});
+        expect(data).to.have.length.greaterThan(0);
+    });
+
+    it("promise: methods: should get all tags with query", async () => {
+        const data = await client.get("/tags", { query: { limit: 1 } });
+        expect(data).to.have.length.greaterThan(0);
+        // expect(data).to.have.length.equal(1);
+    });
+
+    it("promise: methods: should get all tags with query and timeout", async () => {
+        const data = await client.get("/tags", {
+            query: { limit: 1 },
+            timeout: 10000,
+        });
+        expect(data).to.have.length.greaterThan(0);
+        // expect(data).to.have.length.equal(1);
+    });
+
+    it("promise: methods: should get a tag that doesn't exist", async () => {
+        try {
+            const data = await client.get(`/tags/${uuidv4()}`, {});
+        } catch (error) {
+            console.log("getTag error", error);
+            expect(error).to.be.an.instanceof(Object);
+            expect(error.statusCode).to.equal(404);
+            expect(error.statusMessage).to.equal("Not Found");
+            expect(error).to.be.an.instanceof(Object);
+            expect(error.data).to.be.an.instanceof(Object);
+            expect(error.data.error).to.be.an.instanceof(Object);
+            expect(error.data.error.name).to.equal("NotFound");
+        }
+    });
+
+    it("promise: methods: should update a tag that doesn't exist", async () => {
+        try {
+            const data = await client.put(
+                `/tags/${uuidv4()}`,
+                { label: `Test Invalid Tag`, color: "#000000" },
+                {}
+            );
+        } catch (error) {
+            console.log("updateTag error", error);
+            expect(error).to.be.an.instanceof(Object);
+            expect(error.statusCode).to.equal(404);
+            expect(error.statusMessage).to.equal("Not Found");
+            expect(error).to.be.an.instanceof(Object);
+            expect(error.data).to.be.an.instanceof(Object);
+            expect(error.data.error).to.be.an.instanceof(Object);
+            expect(error.data.error.name).to.equal("NotFound");
+        }
+    });
+
+    it("promise: methods: should delete a tag that doesn't exist", async () => {
+        try {
+            const data = await client.delete(`/tags/${uuidv4()}`, {});
+        } catch (error) {
+            console.log("deleteTag error", error);
+            expect(error).to.be.an.instanceof(Object);
+            expect(error.statusCode).to.equal(404);
+            expect(error.statusMessage).to.equal("Not Found");
+            expect(error).to.be.an.instanceof(Object);
+            expect(error.data).to.be.an.instanceof(Object);
+            expect(error.data.error).to.be.an.instanceof(Object);
+            expect(error.data.error.name).to.equal("NotFound");
+        }
+    });
+
+    it("promise: methods: should create, update, and delete a tag", async () => {
+        const rand = uuidv4().split("-")[0];
+        const tag = {
+            name: `test-tag-${rand}`,
+            label: `Test Tag ${rand}`,
+            color: "#000000",
+        };
+
+        const createTag = await client.post("/tags", tag, {});
+        expect(createTag).to.be.an.instanceof(Object);
+        expect(createTag.name).to.equal(tag.name);
+        expect(createTag.label).to.equal(tag.label);
+        expect(createTag.color).to.equal(tag.color);
+
+        const tagId = createTag.id;
+        const updateTag = {
+            label: `Test Tag ${rand} 2`,
+            color: "#000002",
+        };
+
+        const updateTagData = await client.put(`/tags/${tagId}`, updateTag, {});
+        expect(updateTagData).to.be.an.instanceof(Object);
+        expect(updateTagData.name).to.equal(tag.name);
+        expect(updateTagData.label).to.equal(updateTag.label);
+        expect(updateTagData.color).to.equal(updateTag.color);
+
+        const deleteTagData = await client.delete(`/tags/${tagId}`, {});
+        expect(deleteTagData).to.be.an.instanceof(Object);
+        expect(deleteTagData.success).to.equal(true);
     });
 });
