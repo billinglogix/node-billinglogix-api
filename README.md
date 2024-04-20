@@ -1,5 +1,8 @@
 # billinglogix-api
 
+[![NPM Version][npm-version-image]][npm-url]
+[![NPM Install Size][npm-install-size-image]][npm-install-size-url]
+
 BillingLogix API wrapper for the account APIs. This is designed to be a minimal client wrapper around the BillingLogix API to make it easier to make requests to the API.
 
 There are only two small dependencies, `jsonwebtoken` and `node-fetch`, which are used to make signed requests and handle the API requests, respectively.
@@ -161,3 +164,8 @@ blxClient
         // error handling
     });
 ```
+
+[npm-install-size-image]: https://badgen.net/packagephobia/publish/@billinglogix/billinglogix-api
+[npm-install-size-url]: https://packagephobia.com/result?p=%40billinglogix%2Fbillinglogix-api
+[npm-url]: https://www.npmjs.com/package/@billinglogix/billinglogix-api
+[npm-version-image]: https://badgen.net/npm/v/@billinglogix/billinglogix-api
