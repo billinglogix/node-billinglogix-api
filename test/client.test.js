@@ -1,6 +1,3 @@
-// const BillingLogixClient = require("../src/index");
-// const { BillingLogixApiError } = require("../src/lib/errors");
-
 import { BillingLogixClient } from "../src/index.js";
 import { BillingLogixApiError } from "../src/lib/errors.js";
 import { expect } from "chai";
@@ -8,7 +5,6 @@ import { expect } from "chai";
 import dotenv from "dotenv";
 dotenv.config();
 
-// require("dotenv").config();
 const auth = {
     sub: process.env.ACCOUNT_SUB,
     key: process.env.ACCESS_KEY,
