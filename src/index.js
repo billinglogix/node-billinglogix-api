@@ -220,41 +220,6 @@ export class BillingLogixClient {
     request(options, done) {
         this.#log("Request Options", options, done ? "Callback" : "Promise");
 
-        if (!options?.method || typeof options.method !== "string") {
-            throw new BillingLogixApiError("Invalid request method", options);
-        } else if (!validMethods.includes(options.method.toUpperCase())) {
-            throw new BillingLogixApiError(
-                "Unsupported request method",
-                options
-            );
-        }
-
-        if (!options?.path || typeof options.path !== "string") {
-            throw new BillingLogixApiError("Invalid request path", options);
-        }
-
-        if (
-            typeof options.timeout !== "undefined" &&
-            typeof options.timeout !== "number"
-        ) {
-            throw new BillingLogixApiError("Invalid request timeout", options);
-        } else if (options.timeout < 1000 || options.timeout > 60000) {
-            throw new BillingLogixApiError(
-                "Unsupported request timeout",
-                options
-            );
-        }
-
-        if (
-            typeof options.query !== "undefined" &&
-            typeof options.query !== "object"
-        ) {
-            throw new BillingLogixApiError(
-                "Invalid request query params",
-                options
-            );
-        }
-
         // AbortController was added in node v14.17.0 globally; if not available, don't support timeouts
         const AbortController = globalThis.AbortController ?? undefined;
         const controller = AbortController ? new AbortController() : undefined;
@@ -268,6 +233,65 @@ export class BillingLogixClient {
         }
 
         const requestPromise = new Promise((resolve, reject) => {
+            if (typeof options !== "object") {
+                this.#log("Invalid Request Options", options);
+                throw new BillingLogixApiError(
+                    "Invalid request options",
+                    options
+                );
+            }
+            if (!options?.method || typeof options.method !== "string") {
+                this.#log("Invalid Request Method", options);
+                throw new BillingLogixApiError(
+                    "Invalid request method",
+                    options
+                );
+            } else if (!validMethods.includes(options.method.toUpperCase())) {
+                this.#log("Invalid Request Method Option", options);
+                throw new BillingLogixApiError(
+                    "Unsupported request method",
+                    options
+                );
+            }
+
+            if (
+                !options?.path ||
+                typeof options.path !== "string" ||
+                options.path.trim().length === 0 ||
+                options.path.trim() === "/"
+            ) {
+                this.#log("Invalid Request Path", options);
+                throw new BillingLogixApiError("Invalid request path", options);
+            }
+
+            if (
+                typeof options.timeout !== "undefined" &&
+                typeof options.timeout !== "number"
+            ) {
+                this.#log("Invalid Request Timeout", options);
+                throw new BillingLogixApiError(
+                    "Invalid request timeout",
+                    options
+                );
+            } else if (options.timeout < 1000 || options.timeout > 60000) {
+                this.#log("Unsupported Request Timeout", options);
+                throw new BillingLogixApiError(
+                    "Unsupported request timeout",
+                    options
+                );
+            }
+
+            if (
+                typeof options.query !== "undefined" &&
+                typeof options.query !== "object"
+            ) {
+                this.#log("Invalid Request Query Params", options);
+                throw new BillingLogixApiError(
+                    "Invalid request query params",
+                    options
+                );
+            }
+
             try {
                 const queryString = options.query
                     ? `?${new URLSearchParams(options.query).toString()}`
@@ -298,7 +322,7 @@ export class BillingLogixClient {
                     path: requestOptions.path,
                     query: queryString,
                 });
-                fetch(
+                return fetch(
                     `${this.#apiBaseUrl}${requestOptions.path}${queryString}`,
                     requestOptions
                 )
@@ -318,6 +342,10 @@ export class BillingLogixClient {
                                             err
                                         )
                                     );
+                                    // throw new BillingLogixApiError(
+                                    //     "Error parsing response data",
+                                    //     err
+                                    // );
                                 });
                         } else {
                             response
@@ -325,15 +353,12 @@ export class BillingLogixClient {
                                 .then((data) => {
                                     this.#log("Response Error", data);
                                     reject(data);
-                                    // reject(
-                                    //     new BillingLogixApiError(
-                                    //         `Error: ${response.statusText}`,
-                                    //         data
-                                    //     )
-                                    // );
                                 })
                                 .catch((err) => {
-                                    this.#error("Response Failure", err);
+                                    this.#error(
+                                        "Response Parsing Failure",
+                                        err
+                                    );
                                     reject(
                                         new BillingLogixApiError(
                                             "Error parsing request failure",
@@ -352,31 +377,46 @@ export class BillingLogixClient {
             } catch (err) {
                 this.#error("Unexpected Error", err);
                 reject(new BillingLogixApiError("Unexpected Error", err));
+                throw err;
             }
         })
             .then((result) => {
+                this.#log("Promise Success", result);
                 if (timeout) {
                     clearTimeout(timeout);
                 }
+
+                if (done) {
+                    this.#log("Promise Success", "Callback Success");
+                    done(null, result);
+                }
+
                 return result;
             })
             .catch((err) => {
+                this.#log("Promise Error", err);
                 if (timeout) {
                     clearTimeout(timeout);
                 }
+
+                if (done) {
+                    this.#log("Promise Error", "Callback Error");
+                    done(err);
+                }
+
                 throw err;
             });
 
         if (done) {
-            requestPromise
-                .then((result) => {
-                    this.#log("Promise", "Done");
-                    done(null, result);
-                })
-                .catch((err) => {
-                    this.#log("Promise", "Error", result);
-                    done(err);
-                });
+            // requestPromise
+            //     .then((result) => {
+            //         this.#log("Promise", "Done");
+            //         done(null, result);
+            //     })
+            //     .catch((err) => {
+            //         this.#log("Promise", "Error", result);
+            //         done(err);
+            //     });
             return undefined;
         }
         this.#log("Promise Returned", "No callback");

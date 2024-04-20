@@ -276,6 +276,228 @@ describe("BillingLogixClient - Callbacks", () => {
             );
             expect(request).to.be.equal(undefined);
         });
+
+        it("callback: should fail with invalid options", (done) => {
+            const request = client.request("invalid_options", (error, data) => {
+                console.log(
+                    "invalid options: callback request done",
+                    error?.message,
+                    data
+                );
+                expect(error).to.be.an.instanceof(BillingLogixApiError);
+                expect(data).to.equal(undefined);
+                done();
+            });
+            expect(request).to.be.equal(undefined);
+        });
+
+        it("callback: should fail with invalid options: method", (done) => {
+            const request = client.request(
+                {
+                    path: "/tags",
+                    method: "invalid",
+                },
+                (error, data) => {
+                    console.log(
+                        "invalid options: callback request done",
+                        error?.message,
+                        data
+                    );
+                    expect(error).to.be.an.instanceof(BillingLogixApiError);
+                    expect(data).to.equal(undefined);
+                    done();
+                }
+            );
+            expect(request).to.be.equal(undefined);
+        });
+
+        it("callback: should fail with invalid options: path empty", (done) => {
+            const request = client.request(
+                {
+                    path: "",
+                    method: "get",
+                },
+                (error, data) => {
+                    console.log(
+                        "invalid options: callback request done",
+                        error?.message,
+                        data
+                    );
+                    expect(error).to.be.an.instanceof(BillingLogixApiError);
+                    expect(data).to.equal(undefined);
+                    done();
+                }
+            );
+            expect(request).to.be.equal(undefined);
+        });
+
+        it("callback: should fail with invalid options: path null", (done) => {
+            const request = client.request(
+                {
+                    path: null,
+                    method: "get",
+                },
+                (error, data) => {
+                    console.log(
+                        "invalid options: callback request done",
+                        error?.message,
+                        data
+                    );
+                    expect(error).to.be.an.instanceof(BillingLogixApiError);
+                    expect(data).to.equal(undefined);
+                    done();
+                }
+            );
+            expect(request).to.be.equal(undefined);
+        });
+
+        it("callback: should fail with invalid options: path undefined", (done) => {
+            const request = client.request(
+                {
+                    method: "get",
+                },
+                (error, data) => {
+                    console.log(
+                        "invalid options: callback request done",
+                        error?.message,
+                        data
+                    );
+                    expect(error).to.be.an.instanceof(BillingLogixApiError);
+                    expect(data).to.equal(undefined);
+                    done();
+                }
+            );
+            expect(request).to.be.equal(undefined);
+        });
+
+        it("callback: should fail with invalid options: path only /", (done) => {
+            const request = client.request(
+                {
+                    path: "/",
+                    method: "get",
+                },
+                (error, data) => {
+                    console.log(
+                        "invalid options: callback request done",
+                        error?.message,
+                        data
+                    );
+                    expect(error).to.be.an.instanceof(BillingLogixApiError);
+                    expect(data).to.equal(undefined);
+                    done();
+                }
+            );
+            expect(request).to.be.equal(undefined);
+        });
+
+        it("callback: should fail with invalid options: timeout invalid", (done) => {
+            const request = client.request(
+                {
+                    path: "/tags",
+                    method: "get",
+                    timeout: "invalid",
+                },
+                (error, data) => {
+                    console.log(
+                        "invalid options: callback request done",
+                        error?.message,
+                        data
+                    );
+                    expect(error).to.be.an.instanceof(BillingLogixApiError);
+                    expect(data).to.equal(undefined);
+                    done();
+                }
+            );
+            expect(request).to.be.equal(undefined);
+        });
+
+        it("callback: should fail with invalid options: timeout too low", (done) => {
+            const request = client.request(
+                {
+                    path: "/tags",
+                    method: "get",
+                    timeout: 500,
+                },
+                (error, data) => {
+                    console.log(
+                        "invalid options: callback request done",
+                        error?.message,
+                        data
+                    );
+                    expect(error).to.be.an.instanceof(BillingLogixApiError);
+                    expect(data).to.equal(undefined);
+                    done();
+                }
+            );
+            expect(request).to.be.equal(undefined);
+        });
+
+        it("callback: should fail with invalid options: timeout too high", (done) => {
+            const request = client.request(
+                {
+                    path: "/tags",
+                    method: "get",
+                    timeout: 60001,
+                },
+                (error, data) => {
+                    console.log(
+                        "invalid options: callback request done",
+                        error?.message,
+                        data
+                    );
+                    expect(error).to.be.an.instanceof(BillingLogixApiError);
+                    expect(data).to.equal(undefined);
+                    done();
+                }
+            );
+            expect(request).to.be.equal(undefined);
+        });
+
+        it("callback: should fail with invalid options: query invalid", (done) => {
+            const request = client.request(
+                {
+                    path: "/tags",
+                    method: "get",
+                    query: "invalid",
+                },
+                (error, data) => {
+                    console.log(
+                        "invalid options: callback request done",
+                        error?.message,
+                        data
+                    );
+                    expect(error).to.be.an.instanceof(BillingLogixApiError);
+                    expect(data).to.equal(undefined);
+                    done();
+                }
+            );
+            expect(request).to.be.equal(undefined);
+        });
+
+        it("callback: should succeed with all options", (done) => {
+            const request = client.request(
+                {
+                    path: "/tags",
+                    method: "get",
+                    query: {
+                        limit: 1,
+                    },
+                    timeout: 10000,
+                },
+                (error, data) => {
+                    console.log(
+                        "all options: callback request done",
+                        error,
+                        data?.length
+                    );
+                    expect(error).to.equal(null);
+                    expect(data).to.have.length.greaterThan(0);
+                    // expect(data).to.have.length.equal(1);
+                    done();
+                }
+            );
+            expect(request).to.be.equal(undefined);
+        });
     });
 });
 
@@ -299,6 +521,139 @@ describe("BillingLogixClient - Promises", () => {
             });
             expect(data).to.have.length.greaterThan(0);
         });
+
+        it("promise: should fail with invalid options", async () => {
+            try {
+                const data = await client.request("invalid_options");
+            } catch (error) {
+                console.log("invalid options error", error);
+                expect(error).to.be.an.instanceof(BillingLogixApiError);
+            }
+        });
+
+        it("promise: should fail with invalid options: method", async () => {
+            try {
+                const data = await client.request({
+                    path: "/tags",
+                    method: "invalid",
+                });
+            } catch (error) {
+                console.log("invalid options error", error);
+                expect(error).to.be.an.instanceof(BillingLogixApiError);
+            }
+        });
+
+        it("promise: should fail with invalid options: path empty", async () => {
+            try {
+                const data = await client.request({
+                    path: "",
+                    method: "get",
+                });
+            } catch (error) {
+                console.log("invalid options error", error);
+                expect(error).to.be.an.instanceof(BillingLogixApiError);
+            }
+        });
+
+        it("promise: should fail with invalid options: path null", async () => {
+            try {
+                const data = await client.request({
+                    path: null,
+                    method: "get",
+                });
+            } catch (error) {
+                console.log("invalid options error", error);
+                expect(error).to.be.an.instanceof(BillingLogixApiError);
+            }
+        });
+
+        it("promise: should fail with invalid options: path undefined", async () => {
+            try {
+                const data = await client.request({
+                    method: "get",
+                });
+            } catch (error) {
+                console.log("invalid options error", error);
+                expect(error).to.be.an.instanceof(BillingLogixApiError);
+            }
+        });
+
+        it("promise: should fail with invalid options: path only /", async () => {
+            try {
+                const data = await client.request({
+                    path: "/",
+                    method: "get",
+                });
+            } catch (error) {
+                console.log("invalid options error", error);
+                expect(error).to.be.an.instanceof(BillingLogixApiError);
+            }
+        });
+
+        it("promise: should fail with invalid options: timeout invalid", async () => {
+            try {
+                const data = await client.request({
+                    path: "/tags",
+                    method: "get",
+                    timeout: "invalid",
+                });
+            } catch (error) {
+                console.log("invalid options error", error);
+                expect(error).to.be.an.instanceof(BillingLogixApiError);
+            }
+        });
+
+        it("promise: should fail with invalid options: timeout too low", async () => {
+            try {
+                const data = await client.request({
+                    path: "/tags",
+                    method: "get",
+                    timeout: 500,
+                });
+            } catch (error) {
+                console.log("invalid options error", error);
+                expect(error).to.be.an.instanceof(BillingLogixApiError);
+            }
+        });
+
+        it("promise: should fail with invalid options: timeout too high", async () => {
+            try {
+                const data = await client.request({
+                    path: "/tags",
+                    method: "get",
+                    timeout: 60001,
+                });
+            } catch (error) {
+                console.log("invalid options error", error);
+                expect(error).to.be.an.instanceof(BillingLogixApiError);
+            }
+        });
+
+        it("promise: should fail with invalid options: query invalid", async () => {
+            try {
+                const data = await client.request({
+                    path: "/tags",
+                    method: "get",
+                    query: "invalid",
+                });
+            } catch (error) {
+                console.log("invalid options error", error);
+                expect(error).to.be.an.instanceof(BillingLogixApiError);
+            }
+        });
+
+        it("promise: should succeed with all options", async () => {
+            const data = await client.request({
+                path: "/tags",
+                method: "get",
+                query: {
+                    limit: 1,
+                },
+                timeout: 10000,
+            });
+            expect(data).to.have.length.greaterThan(0);
+            // expect(data).to.have.length.equal(1);
+        });
     });
 });
 
@@ -317,6 +672,7 @@ describe("BillingLogixClient - Promises - Invalid Account", () => {
                     method: "get",
                 });
             } catch (error) {
+                // console.log("invalid account error", error);
                 expect(error).to.be.an.instanceof(Object);
                 expect(error.message).to.equal("Forbidden");
             }
@@ -335,6 +691,7 @@ describe("BillingLogixClient - Promises - Invalid Account", () => {
                     method: "get",
                 });
             } catch (error) {
+                // console.log("invalid auth key error", error);
                 expect(error).to.be.an.instanceof(Object);
                 expect(error.statusCode).to.equal(401);
                 expect(error.statusMessage).to.equal("Unauthorized");
@@ -357,6 +714,7 @@ describe("BillingLogixClient - Promises - Invalid Account", () => {
                     method: "get",
                 });
             } catch (error) {
+                // console.log("invalid auth secret error", error);
                 expect(error).to.be.an.instanceof(Object);
                 expect(error.statusCode).to.equal(401);
                 expect(error.statusMessage).to.equal("Unauthorized");
