@@ -342,10 +342,6 @@ export class BillingLogixClient {
                                             err
                                         )
                                     );
-                                    // throw new BillingLogixApiError(
-                                    //     "Error parsing response data",
-                                    //     err
-                                    // );
                                 });
                         } else {
                             response
@@ -408,15 +404,6 @@ export class BillingLogixClient {
             });
 
         if (done) {
-            // requestPromise
-            //     .then((result) => {
-            //         this.#log("Promise", "Done");
-            //         done(null, result);
-            //     })
-            //     .catch((err) => {
-            //         this.#log("Promise", "Error", result);
-            //         done(err);
-            //     });
             return undefined;
         }
         this.#log("Promise Returned", "No callback");
@@ -526,3 +513,5 @@ export class BillingLogixClient {
 }
 
 export default BillingLogixClient;
+
+export { BillingLogixApiError };
