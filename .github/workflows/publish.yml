@@ -30,6 +30,12 @@ jobs:
         run: npm ci
       - name: Build
         run: npm build
+      - name: Test
+        run: npm test
+        env:
+          ACCOUNT_SUB: ${{secrets.ACCOUNT_SUB}}
+          ACCESS_KEY: ${{secrets.ACCESS_KEY}}
+          SECRET_KEY: ${{secrets.SECRET_KEY}}
       - name: Create New Version
         run: |
           npm version --new-version ${{github.event.inputs.release}} --no-git-tag-version
