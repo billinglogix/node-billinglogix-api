@@ -3,6 +3,7 @@
  * @extends {Error} - Error class
  * @param {string} message - Error message
  * @param {object} data - Additional error data
+ * @type {BillingLogixApiError} - BillingLogix API Error
  */
 class BillingLogixApiError extends Error {
     constructor(message, data) {
@@ -17,7 +18,7 @@ class BillingLogixApiError extends Error {
 /**
  * Convert error to JSON
  * @param {boolean} stack - Include stack trace
- * @returns {BillingLogixApiErrorJSON} - JSON object with error properties
+ * @returns {BillingLogixApiError} - JSON object with error properties
  */
 BillingLogixApiError.prototype.toJSON = function (stack = false) {
     const stackTrace = stack === true ? { stack: this.stack } : {};
@@ -37,4 +38,4 @@ BillingLogixApiError.prototype.toJSON = function (stack = false) {
     }
 };
 
-export { BillingLogixApiError };
+module.exports = exports = { BillingLogixApiError };
