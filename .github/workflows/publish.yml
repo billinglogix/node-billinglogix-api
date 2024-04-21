@@ -50,4 +50,6 @@ jobs:
         run: |
           PACKAGE_VERSION=$(node -p "require('./package.json').version")
           gh release create "v${PACKAGE_VERSION}"
+        env:
+          GH_TOKEN: ${{ github.token }}
         
