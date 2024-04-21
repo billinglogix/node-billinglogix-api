@@ -25,7 +25,7 @@ import { BillingLogixClient } from "@billinglogix/billinglogix-api"; // ES6
 const blxClient = new BillingLogixClient(ACCOUNT_SUB, ACCESS_KEY, SECRET_KEY);
 
 // Callback style
-blxClient.get("/accounts/members/:member_id", {}, function (err, result) {
+blxClient.get("/accounts/member/:member_id", {}, function (err, result) {
     if (err) {
         // error handling
     } else {
@@ -35,7 +35,7 @@ blxClient.get("/accounts/members/:member_id", {}, function (err, result) {
 
 // Promise style
 blxClient
-    .get("/accounts/members/:member_id", {})
+    .get("/accounts/member/:member_id", {})
     .then(function (result) {
         // success handling
     })
@@ -45,7 +45,7 @@ blxClient
 
 // Using async/await
 try {
-    const result = await blxClient.get("/accounts/members/:member_id", {});
+    const result = await blxClient.get("/accounts/member/:member_id", {});
 
     // success handling
 } catch (err) {
@@ -83,7 +83,7 @@ const blxClient = new BillingLogixClient(ACCOUNT_SUB, ACCESS_KEY, SECRET_KEY, {
 blxClient
     .request({
         method: "GET", // GET, POST, PUT, PATCH, DELETE
-        path: "/accounts/members/:member_id",
+        path: "/accounts/member/:member_id",
         query: {
             test: "test-query-param",
         },
@@ -106,7 +106,7 @@ blxClient
 blxClient.request(
     {
         method: "GET", // GET, POST, PUT, PATCH, DELETE
-        path: "/accounts/members/:member_id",
+        path: "/accounts/member/:member_id",
         query: {
             test: "test-query-param",
         },
@@ -144,7 +144,7 @@ This allows shorthand forms like:
 
 ```javascript
 blxClient
-    .get("/accounts/members/:member_id")
+    .get("/accounts/member/:member_id")
     .then(function (results) {
         // success handling
     })
@@ -153,7 +153,7 @@ blxClient
     });
 
 blxClient
-    .post("/accounts/members", {
+    .post("/accounts/member", {
         email: "testme@test.com",
         fistName: "Test",
         lastName: "Me",
