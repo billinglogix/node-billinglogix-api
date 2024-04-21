@@ -19,7 +19,7 @@ $ npm i @billinglogix/billinglogix-api
 The module exports the client, `BillingLogixClient`, which is used to make requests to the BillingLogix API. It supports both callback and promise handling along with both CommonJS and ES6 module imports.
 
 ```javascript
-// const BillingLogix = require("@billinglogix/billinglogix-api"); // CommonJS
+// const { BillingLogixClient } = require("@billinglogix/billinglogix-api"); // CommonJS
 import { BillingLogixClient } from "@billinglogix/billinglogix-api"; // ES6
 
 const blxClient = new BillingLogixClient(ACCOUNT_SUB, ACCESS_KEY, SECRET_KEY);

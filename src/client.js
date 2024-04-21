@@ -11,8 +11,12 @@
  */
 
 import { BillingLogixApiError } from "./lib/errors.js";
-import fetch from "node-fetch";
+// import fetch from "node-fetch";
 import jwt from "jsonwebtoken";
+
+// load fetch with cjs friendly import
+const fetch = (...args) =>
+    import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 /**
  * Valid HTTP methods
