@@ -1,6 +1,6 @@
 {
     "name": "@billinglogix/billinglogix-api",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Billing Logix API wrapper for the account APIs.",
     "author": "Todd Schlomer <todd@billinglogix.com> (https://billinglogix.com)",
     "license": "MIT",
