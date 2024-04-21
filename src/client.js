@@ -23,7 +23,7 @@ const validMethods = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 
 /**
  * BillingLogix API Options
- * @type {import("./types").BillingLogixOptions}
+ * @type {import("./index").BillingLogixOptions}
  * @constant
  */
 const defaultOptions = {
@@ -35,7 +35,7 @@ const defaultOptions = {
 
 /**
  * BillingLogix API Client
- * @type {import("./types").BillingLogixClient}
+ * @type {import("./index").BillingLogixClient}
  * @class
  */
 export class BillingLogixClient {
@@ -52,7 +52,7 @@ export class BillingLogixClient {
      * @param {string} acccountSub - BillingLogix Account subdomain
      * @param {string} accessKey - API access key
      * @param {string} secretKey - API secret key
-     * @param {import("./types").BillingLogixOptions} options - Additional options
+     * @param {import("./index").BillingLogixOptions} options - Additional options
      * @constructor - BillingLogix API constructor
      */
     constructor(acccountSub, accessKey, secretKey, options = {}) {
@@ -167,7 +167,7 @@ export class BillingLogixClient {
 
     /**
      * Add the JWT to all outgoing API requests
-     * @param {import("./types").BillingLogixClient} blxClient
+     * @param {import("./index").BillingLogixClient} blxClient
      * @param {HttpRequest} request
      * @returns {HttpRequest}
      * @throws {BillingLogixApiError} - No Authentication Data
@@ -192,8 +192,8 @@ export class BillingLogixClient {
 
     /**
      * Clean the input headers
-     * @param {import("./types").Headers} headers - Request headers
-     * @returns {import("./types").Headers} - Cleaned headers
+     * @param {import("./index").Headers} headers - Request headers
+     * @returns {import("./index").Headers} - Cleaned headers
      */
     #cleanHeaders(headers) {
         if (typeof headers !== "object") {
@@ -212,7 +212,7 @@ export class BillingLogixClient {
 
     /**
      * Make an API request
-     * @param {import("./types").BillingLogixRequestOptions} options - Request options
+     * @param {import("./index").BillingLogixRequestOptions} options - Request options
      * @param {Function | undefined} done - Callback function
      * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
      * @throws {BillingLogixApiError} - Invalid request
@@ -413,7 +413,7 @@ export class BillingLogixClient {
     /**
      * API GET request
      * @param {string} path - Request path
-     * @param {import("./types").BillingLogixOptionalRequestOptions} options - Request options
+     * @param {import("./index").BillingLogixOptionalRequestOptions} options - Request options
      * @param {Function | undefined} done - Callback function
      * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
      * @throws {BillingLogixApiError} - Invalid request
@@ -433,7 +433,7 @@ export class BillingLogixClient {
      * API POST request
      * @param {string} path - Request path
      * @param {any} body - Request body
-     * @param {import("./types").BillingLogixOptionalRequestOptions} options - Request options
+     * @param {import("./index").BillingLogixOptionalRequestOptions} options - Request options
      * @param {Function | undefined} done - Callback function
      * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
      * @throws {BillingLogixApiError} - Invalid request
@@ -454,7 +454,7 @@ export class BillingLogixClient {
      * API PUT request
      * @param {string} path - Request path
      * @param {any} body - Request body
-     * @param {import("./types").BillingLogixOptionalRequestOptions} options - Request options
+     * @param {import("./index").BillingLogixOptionalRequestOptions} options - Request options
      * @param {Function | undefined} done - Callback function
      * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
      * @throws {BillingLogixApiError} - Invalid request
@@ -475,7 +475,7 @@ export class BillingLogixClient {
      * API PATCH request
      * @param {string} path - Request path
      * @param {any} body - Request body
-     * @param {import("./types").BillingLogixOptionalRequestOptions} options - Request options
+     * @param {import("./index").BillingLogixOptionalRequestOptions} options - Request options
      * @param {Function | undefined} done - Callback function
      * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
      * @throws {BillingLogixApiError} - Invalid request
@@ -495,7 +495,7 @@ export class BillingLogixClient {
     /**
      * API DELETE request
      * @param {string} path - Request path
-     * @param {import("./types").BillingLogixOptionalRequestOptions} options - Request options
+     * @param {import("./index").BillingLogixOptionalRequestOptions} options - Request options
      * @param {Function | undefined} done - Callback function
      * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
      * @throws {BillingLogixApiError} - Invalid request

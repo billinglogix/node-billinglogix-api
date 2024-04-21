@@ -1,4 +1,4 @@
-import { BillingLogixClient } from "../src/index.js";
+import { BillingLogixClient } from "../src/client.js";
 import { BillingLogixApiError } from "../src/lib/errors.js";
 import { expect } from "chai";
 import { v4 as uuidv4 } from "uuid";

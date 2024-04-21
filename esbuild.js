@@ -2,8 +2,8 @@ import { build } from "esbuild";
 import { nodeExternalsPlugin } from "esbuild-node-externals";
 
 build({
-    entryPoints: ["./src/index.js"],
-    outfile: "dist/cjs/index.js",
+    entryPoints: ["./src/client.js"],
+    outfile: "dist/cjs/index.cjs",
     bundle: true,
     minify: true,
     treeShaking: true,
@@ -14,7 +14,7 @@ build({
 }).catch(() => process.exit(1));
 
 build({
-    entryPoints: ["./src/index.js"],
+    entryPoints: ["./src/client.js"],
     outfile: "dist/mjs/index.js",
     bundle: true,
     minify: true,
