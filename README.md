@@ -1,5 +1,6 @@
 # billinglogix-api
 
+[![Tests](https://github.com/billinglogix/node-billinglogix-api/actions/workflows/tests.yml/badge.svg)](https://github.com/billinglogix/node-billinglogix-api/actions/workflows/tests.yml)
 [![NPM Version][npm-version-image]][npm-url]
 [![NPM Install Size][npm-install-size-image]][npm-install-size-url]
 
