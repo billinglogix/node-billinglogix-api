@@ -55,7 +55,8 @@ try {
 
 ## Usage
 
-For details on the possible calls, refer to the BillingLogix API documentation: [https://help.billinglogix.com](https://help.billinglogix.com)
+For details on the possible calls, refer to the BillingLogix API documentation at
+[https://help.billinglogix.com](https://help.billinglogix.com/guides/api-documentation).
 
 ### Promise and Callback Support
 
