@@ -4,7 +4,6 @@
  * JavaScript BillingLogix API Client
  * @module billinglogix-api
  * @license MIT
- * @version 1.0.0
  * @since 1.0.0
  * @description A simple BillingLogix API client for Node.js
  * @repository https://github.com/billinglogix/node-billinglogix-api
