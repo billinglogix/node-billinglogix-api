@@ -1,8 +1,8 @@
 # billinglogix-api
 
 [![Tests](https://github.com/billinglogix/node-billinglogix-api/actions/workflows/tests.yml/badge.svg)](https://github.com/billinglogix/node-billinglogix-api/actions/workflows/tests.yml)
-[![NPM Version][npm-version-image]][npm-url]
-[![NPM Install Size][npm-install-size-image]][npm-install-size-url]
+[![NPM Version](https://badgen.net/npm/v/@billinglogix/billinglogix-api)][npm-url]
+[![NPM Install Size](https://badgen.net/packagephobia/publish/@billinglogix/billinglogix-api)][npm-install-size-url]
 
 BillingLogix API wrapper for the account APIs. This is designed to be a minimal client wrapper around the BillingLogix API to make it easier to make requests to the API.
 
